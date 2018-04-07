@@ -1,0 +1,305 @@
+.numberButtons {
+    border: 3px;
+    background-color: #f1f1f1;
+    padding: 4px 6px;
+    float: inherit;
+    z-index: 1;
+    
+}
+
+#numberButton, .upgradeButtons {
+    visibility: visible;
+    
+}
+
+.buildingButtons{
+    border: 3px solid gray;
+    background-color: #f1f1f1;
+    padding: 5px 7px;
+    float: inherit;
+    font-size: 16px;
+    
+    
+}
+
+#upgradeTable {
+    visibility: visible;
+}
+
+.boldedNumbers {
+    font-weight: bold;
+}
+
+.sidebarLeft {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 19.7%; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: #eaeaea; 
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+}
+
+.sidebarRight {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 20%; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 80%;
+    background-color: #ffffff; 
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+}
+
+.main {
+    margin-left: 500px; /* Same as the width of the sidebar */
+    padding: 0px 10px;
+}
+
+#resourceDisplayTable {
+    padding: 33px 5px;
+    font-size: 23px;    
+}
+
+#buildingsTable {
+    padding: 30px;
+    font-size: 24px;    
+}
+
+
+
+#buildingsTable button {
+    border: 1px solid gray;
+    background-color: #ffffff;
+    width: 300px;
+    height: 60px;
+    padding: 15px 21px;
+    float: inherit;
+    font-size: 16px;
+    
+    transition: background-color 0.3s ease;
+}
+
+#buildingsTable button:hover {
+    background-color: #f1f1f1;
+}
+
+#resourceDisplayTable td {
+    padding: 8px 8px;
+}
+
+#numberDisp {
+    font-family: serif;
+    font-size: 40;
+    font-weight: bold;
+    padding: 33px;
+    color: darkblue;
+}
+
+
+
+#moneyTextDisp {
+    visibility: visible;
+    color: green;
+}
+
+#scienceTextDisp {
+    visibility: visible;
+    color: #139be8;
+    
+}
+
+#popularityTextDisp {
+    visibility: hidden;
+    color: rebeccapurple;
+}
+
+#energyTextDisp {
+    visibility: hidden;
+    color: orange;
+}
+
+#darkMatterTextDisp {
+    visibility: hidden;
+    color: #2f2f2f;
+}
+
+#numberTab {
+ font-size: 24;   
+ font-weight: bold;   
+}
+
+.tab {
+    overflow: hidden;
+    width: 74%;
+    left: 2%;
+    border: 2px solid #ccc;
+    background-color: #f1f1f1;
+    z-index: 1;
+}
+
+.tab button {
+    float: inherit;
+    border: 4px;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: background-color 0.3s ease;
+    background-color: #ededed;
+}
+.tab button:hover {
+    background-color: darkgray;
+}
+
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+#activityLog {
+    left: 99%;
+}
+
+#activityTable tr {
+    padding: 60px 60px;
+}
+
+
+#paddingForActivityLog {
+    padding: 500px;
+}
+
+#activityLogHeader {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip {
+    visibility: hidden;
+    width: 390px;
+    background-color: lightgray;
+    color: black;
+    text-align: left;
+    padding: 5px 2px;
+    border: 2px;
+    font-size: 18px;
+    font-weight: normal;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    
+}
+.tooltipMoneyColor {
+    color: green;
+}
+.tooltipScienceColor {
+    color: #139be8;
+}
+
+.tooltipPopularityColor {
+    color: rebeccapurple;
+}
+
+.tooltipEnergyColor {
+    color: orange;
+}
+
+.tooltipDarkMatterColor {
+    color: #2f2f2f;
+}
+
+#gradScienceProdBase {
+    visibility: hidden;
+}
+/* Show the tooltip text when you mouse over the tooltip container */
+ #buyBumButton:hover + #buyBumTooltip {
+    visibility: visible;
+}
+
+ #buyGradButton:hover + #buyGradTooltip {
+    visibility: visible;
+}
+
+.gradScienceProdBase {
+    visibility: hidden;
+}
+ 
+#buyMathematicianButton:hover + #buyMathematicianTooltip {
+    visibility: visible;
+}
+
+#buyPaperBoyButton:hover + #buyPaperBoyTooltip {
+    visibility: visible;
+}
+
+#buyComputerButton:hover + #buyComputerTooltip {
+    visibility: visible;
+}
+
+#buyIndustrialCalculatorButton:hover + #buyIndustrialCalculatorTooltip {
+    visibility: visible;
+}
+
+#buyAcceleratorButton:hover + #buyAcceleratorTooltip {
+    visibility: visible;
+}
+
+
+
+#newClothesButton:hover + #newClothesTooltip {
+    visibility: visible;
+}
+
+#tellingAFriendUpgButton:hover + #tellingAFriendUpgTooltip {    
+    visibility: visible;
+}
+
+#mastersDegreeUpgButton:hover + #mastersDegreeUpgTooltip {    
+    visibility: visible;
+}
+
+
+#extraCollegeCreditUpgButton:hover + #extraCollegeCreditUpgTooltip {
+    visibility: visible;
+}
+
+#number2PencilsUpgButton:hover + #number2PencilsUpgTooltip {
+    visibility: visible;
+}
+
+#energyDrinksUpgButton:hover + #energyDrinksUpgTooltip {
+    visibility: visible;
+}
+
+#updatedOperatingSystemUpgButton:hover + #updatedOperatingSystemUpgTooltip {
+    visibility: visible;
+}
+
+#dilithiumPhotoelectronAbsorbersUpgButton:hover + #dilithiumPhotoelectronAbsorbersUpgTooltip {
+    visibility: visible;
+}
+
+#radiantMatterUpgButton:hover + #radiantMatterUpgTooltip {
+    visibility: visible;
+}
