@@ -1,0 +1,106 @@
+<html>
+
+<body class='main'>
+ <script src =https://code.jquery.com/jquery-3.3.1.js></script>
+ <link rel="stylesheet" type="text/css" href="style.css" >     
+ <div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'numberTab')">Number</button>
+  <button class="tablinks" onclick="openTab(event, 'upgradeTab')">Upgrades</button>
+  <button class="tablinks" onclick="checkResetUnlock()">Recount</button>
+</div>
+    <div class='sidebarLeft'> 
+        <div id='numberDisp'></div>
+        <table id='resourceDisplayTable'>
+        <tr id='moneyTextDisp'>
+            <td><span id='moneyName'>Money</span></td>
+            <td><span id='moneyDisp'>0</span></td>
+            <td><span> (+</span> <span id='moneyProductionTotalDisp'>0 </span> <span>/sec)</span> </td>
+        </tr>
+        <tr id='scienceTextDisp'>
+            <td><span id='scienceName'>Science</span></td> 
+            <td><span id='scienceDisp'>0</span></td>
+            <td><span> (+</span><span id='scienceProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+        </tr>
+        <tr id='popularityTextDisp'>
+            <td><span id='popularityName'>Popularity</span></td> 
+            <td><span id='popularityDisp'>0</span></td>
+            <td><span> (+</span><span id='popularityProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+        </tr>
+        <tr id='energyTextDisp'>
+            <td><span id='energyName'>Energy</span></td> 
+            <td><span id='energyDisp'>0</span></td>
+            <td><span> (+</span><span id='energyProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+        </tr>
+        <tr id='darkMatterTextDisp'>
+            <td><span id='darkMatterName'>Energy</span></td> 
+            <td><span id='darkMatterDisp'>0</span></td>
+            <td><span> (+</span><span id='darkMatterProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+        </tr>
+        </table>
+
+</div>
+<!-- Tab content -->
+<div id="numberTab" class="tabcontent">
+    <span><button id="numberButton" class="buildingButtons" onClick="numberClick(1+BUILDINGS[3].count)">FIX UPGRADES b/c they don't work</button></span> <span id='paddingForActivityLog'></span>  
+
+
+<br />
+
+    
+    
+<table id='buildingsTable'>   
+    <tr>
+
+    </tr>
+</table>    
+
+</div>
+
+<div class='sidebarRight'>
+    <table id='activityTable'>
+        <tr>
+            <th>
+                <span id='activityLogHeader'> Activity Log </span>
+            </th>   
+        </tr>
+    </table>
+    
+    
+</div>
+            
+            
+
+<div id="upgradeTab" class="tabcontent">
+ 
+    
+    <!--Upgrade template. MAKE SURE THAT ONLY THE WRAPPER <DIV> HAS THE TOOLTIP CLASS!!!!!!! Otherwise nothing will show. 
+    
+    Also make sure to update for every copy-paste:
+        * EVERY ID name that includes upgrades.
+        * The onClick values for each upgrade (check the upgProdResource parameter as well, make sure to set to '' if none) 
+    
+    -->
+    <table id='upgradeTable'>
+        
+        <tr>
+            <td>
+            </td>
+        </tr>
+
+   
+  </table>
+ 
+
+  
+
+<div id="Recount" class="tabcontent">
+    <h3>Get to 5e100 and we can talk about recounting.</h3>
+</div>
+    
+    
+    <script type="text/javascript" src="game.js"></script>   
+    <script type="text/javascript" src="gameStory.js"></script>
+ 
+</body>
+  
+    </html>
