@@ -16,20 +16,20 @@ var player = {
 }; //Handles player-based actions.
 var RESOURCES = [ //Handles RESOURCES of all kinds.
     {     
-    count: 100000000,
-    totalAmount: 10000000000000,
+    count: 0,
+    totalAmount: 0,
     upgProd: 0,
     id: 'number'
     },    
     {
-    count: 10000000000, // Raw count, unrounded until numFormat().
+    count: 0, // Raw count, unrounded until numFormat().
     totalAmount: 0,
-    upgProd: 29999, //Amount gained from upgrades per TICK.
+    upgProd: 0, //Amount gained from upgrades per TICK.
     id: 'money'
     },
     {
-    count: 25000000,
-    totalAmount: 2500000,
+    count: 0,
+    totalAmount: 0,
     upgProd: 0,
     id: 'science'
     },
@@ -42,7 +42,7 @@ var RESOURCES = [ //Handles RESOURCES of all kinds.
     {
     count: 50000,
     totalAmount: 0,
-    upgProd: 0.005, //Amount produced from upgrades.
+    upgProd: 0, //Amount produced from upgrades.
     id: 'energy'
     },
     {
