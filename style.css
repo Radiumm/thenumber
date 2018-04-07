@@ -7,6 +7,11 @@
     
 }
 
+body {
+    width: 1366px;
+    height: 768px;
+  }
+
 #numberButton, .upgradeButtons {
     visibility: visible;
     
@@ -33,6 +38,7 @@
 .sidebarLeft {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 19.7%; /* Set the width of the sidebar */
+    min-width: 500px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
@@ -41,6 +47,8 @@
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 20px;
 }
+
+
 
 .sidebarRight {
     height: 100%; /* Full-height: remove this if you want "auto" height */
@@ -66,10 +74,20 @@
 
 #buildingsTable {
     padding: 30px;
-    font-size: 24px;    
+    font-size: 24px; 
+    width: 25%;   
 }
 
+@media only screen and (max-width: 1100px) { /* If screen size < 1100px */
+    .productionTotalDisp { 
+        visibility: hidden;
+    }
+    .sidebarLeft {
+        min-width: 300px;
+        width: 17%;
+    }
 
+}
 
 #buildingsTable button {
     border: 1px solid gray;
@@ -159,6 +177,8 @@
     padding: 6px 12px;
     border: 1px solid #ccc;
     border-top: none;
+    width: 45%;
+    min-width: 200px;
 }
 
 .tab button.active {
