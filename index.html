@@ -6,6 +6,7 @@
  <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'numberTab')">Number</button>
   <button class="tablinks" onclick="openTab(event, 'upgradeTab')">Upgrades</button>
+  <button class="tablinks" onclick="openTab(event, 'technologyTab')">Technology</button>
   <button class="tablinks" onclick="checkResetUnlock()">Recount</button>
 </div>
     <div class='sidebarLeft'> 
@@ -14,34 +15,34 @@
         <tr id='moneyTextDisp'>
             <td><span id='moneyName'>Money</span></td>
             <td><span id='moneyDisp'>0</span></td>
-            <td><span> (+</span> <span id='moneyProductionTotalDisp'>0 </span> <span>/sec)</span> </td>
+            <td class = 'productionTotalDisp'><span> (+</span> <span  id='moneyProductionTotalDisp'>0 </span> <span>/sec)</span> </td>
         </tr>
         <tr id='scienceTextDisp'>
             <td><span id='scienceName'>Science</span></td> 
             <td><span id='scienceDisp'>0</span></td>
-            <td><span> (+</span><span id='scienceProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+            <td class = 'productionTotalDisp'><span> (+</span><span  id='scienceProductionTotalDisp'>0 </span> <span>/sec)</span></td>
         </tr>
         <tr id='popularityTextDisp'>
             <td><span id='popularityName'>Popularity</span></td> 
             <td><span id='popularityDisp'>0</span></td>
-            <td><span> (+</span><span id='popularityProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+            <td class = 'productionTotalDisp'><span > (+</span><span  id='popularityProductionTotalDisp'>0 </span> <span>/sec)</span></td>
         </tr>
         <tr id='energyTextDisp'>
             <td><span id='energyName'>Energy</span></td> 
             <td><span id='energyDisp'>0</span></td>
-            <td><span> (+</span><span id='energyProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+            <td class = 'productionTotalDisp'><span> (+</span><span  id='energyProductionTotalDisp'>0 </span> <span>/sec)</span></td>
         </tr>
         <tr id='darkMatterTextDisp'>
             <td><span id='darkMatterName'>Energy</span></td> 
             <td><span id='darkMatterDisp'>0</span></td>
-            <td><span> (+</span><span id='darkMatterProductionTotalDisp'>0 </span> <span>/sec)</span></td>
+            <td class = 'productionTotalDisp'><span> (+</span><span  id='darkMatterProductionTotalDisp'>0 </span> <span>/sec)</span></td>
         </tr>
         </table>
 
 </div>
 <!-- Tab content -->
 <div id="numberTab" class="tabcontent">
-    <span><button id="numberButton" class="buildingButtons" onClick="numberClick(1+BUILDINGS[3].count)">Increase the Number</button></span> 
+    <span><button id="numberButton" class="buildingButtons" onClick="numberClick(1+BUILDINGS[3].count)">FIX UPGRADES b/c they don't work</button></span>
 
 
 <br />
@@ -56,6 +57,9 @@
 
 </div>
 
+
+            
+            
 
 <div id="upgradeTab" class="tabcontent">
  
@@ -80,14 +84,25 @@
 
   
 
-<div id="Recount" class="tabcontent">
-    <h3>Get to 5e100 and we can talk about recounting.</h3>
+<div id="technologyTab" class="tabcontent">
+  
+
+    <table id='technologyTable'>
+        
+        <tr>
+            <td>
+            </td>
+        </tr>
+
+   
+  </table>
+
 </div>
-    
-    
+    <script type="text/javascript" src="data/buildings.js"></script>
+    <script type="text/javascript" src="data/upgrades.js"></script>
     <script type="text/javascript" src="game.js"></script>   
     <script type="text/javascript" src="gameStory.js"></script>
- 
+    
 </body>
   
     </html>
