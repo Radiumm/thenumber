@@ -40,9 +40,9 @@ var RESOURCES = [ //Handles RESOURCES of all kinds.
     id: 'popularity'
     },
     {
-    count: 50000,
+    count: 0,
     totalAmount: 0,
-    upgProd: 0.005, //Amount produced from upgrades.
+    upgProd: 0, //Amount produced from upgrades.
     id: 'energy'
     },
     {
