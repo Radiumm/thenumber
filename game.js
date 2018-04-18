@@ -568,6 +568,7 @@ if (/*@cc_on!@*/false) { // check for Internet Explorer
 }
 
 function addCurrency(numTicksOffline) {
+	console.log(numTicksOffline);
     for (let prod of PRODUCTION) {
         if (prod.type == 'material') {
             CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, prod.name)].count += prod.value * numTicksOffline; //Adds amount * offline (if applicable).
