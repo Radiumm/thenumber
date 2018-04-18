@@ -553,7 +553,7 @@ function onBlur() {
 };
 function onFocus(){
     const msOffline = Date.now() - start;
-    numTicksOffline += Math.ceil(msOffline / 200);
+    numTicksOffline += Math.ceil(msOffline / 360);
     addCurrency(numTicksOffline);
 };
 
