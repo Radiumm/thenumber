@@ -1,7 +1,7 @@
 /* Shorthand for getElementById or getElementsByClassName */
 var getId = function (id) {return document.getElementById(id);};
 var getClass = function (c) {return document.getElementsByClassName(c);};
-
+//.
 function returnIndex (array, targetID) {
     var index = array.findIndex(function(x) {
         const y = x.id || x.name;
