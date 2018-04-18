@@ -4,50 +4,51 @@ var getClass = function (c) {return document.getElementsByClassName(c);};
 
 function returnIndex (array, targetID) {
     var index = array.findIndex(function(x) {
-        return x.id == targetID;
+        const y = x.id || x.name;
+        return y == targetID;
     });
     return index;
 }
 
 /* Objects of the game */
 var player = {
-    moneyRatio: 3, //Multiplier of money as a function of number.
+    moneyRatio: Number(2.67 - Number(UPGRADESPURCHASED.includes('benefits') ? 0.002 * BUILDINGS.returnIndex(BUILDINGS, 'gradBuilding'):0)),
     globalMultiplier: 1.000 //Total multiplier, multiplies ALL production.
 }; //Handles player-based actions.
 var RESOURCES = [ //Handles RESOURCES of all kinds.
     {     
     count: 0,
-    totalAmount: 0,
+    totalCount: 0,
     upgProd: 0,
     id: 'number'
     },    
     {
     count: 0, // Raw count, unrounded until numFormat().
-    totalAmount: 0,
+    totalCount: 0,
     upgProd: 0, //Amount gained from upgrades per TICK.
     id: 'money'
     },
     {
     count: 0,
-    totalAmount: 0,
+    totalCount: 0,
     upgProd: 0,
     id: 'science'
     },
     {
     count: 0,
-    totalAmount: 0,
+    totalCount: 0,
     upgProd: 0, //Amount produced from upgrades.
     id: 'popularity'
     },
     {
-    count: 50000,
-    totalAmount: 0,
+    count: 0,
+    totalCount: 0,
     upgProd: 0, //Amount produced from upgrades.
     id: 'energy'
     },
     {
     count: 0,
-    totalAmount: 0,
+    totalCount: 0,
     upgProd: 0, //Amount produced from upgrades.
     id: 'darkMatter'
     }
@@ -151,285 +152,235 @@ function numFormat(x, shortIgnore) {
 
 function numberClick(count) {
     RESOURCES[0].count += count;
-    RESOURCES[0].totalAmount += count;
+    RESOURCES[0].totalCount += count;
     getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
     
 
 }
 
-
+var resourceTypes = ['money', 'science', 'popularity', 'energy', 'darkMatter']; // UPDATE THIS to match the number of resource types.
  var numCurrencies = 0; //Counter to verify that all currencies are accounted for. Compared to "satisfied' later on.
  var satisfied = 0;
- function upgrade (upgradeItem, iter) {
-    iter = iter || 0;
-    if (iter == 0) {
-        numCurrencies = satisfied = 0;
+ function upgrade (upgrade) {
+    let insufficient = false;
+    for (let cost of upgrade.costs){
+        let value = numFormat(Math.ceil(cost.value));
+        let n = 0;
+        if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+            n = CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count;        
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        } else {
+            n = RESOURCES[returnIndex(RESOURCES, cost.name)].count;          
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        }
+        
     }
-   
-    var resourceTypes = ['money', 'science', 'popularity', 'energy', 'darkMatter']; // UPDATE THIS to match the number of resource types.
-     //Checks null value of each resource type for the upgrade.      
-            
-            if (!(upgradeItem[resourceTypes[iter].concat("Cost")] == null)) { // If the cost value not null
+    if (!(insufficient)) {
+        for (let cost of upgrade.costs) { 
+            let temp = cost.value; // Removes the currency from your inventory.
+            if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+                CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count);
                
-                numCurrencies++; 
-                
-                let num = RESOURCES[returnIndex(RESOURCES, resourceTypes[iter])]['count'];                
-                if (num >= upgradeItem[resourceTypes[iter].concat('Cost')]) {
-                   satisfied++;//If count > cost, add +1 to satsified.
-                  
-                }
+            } else {
+                RESOURCES[returnIndex(RESOURCES, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(RESOURCES[returnIndex(RESOURCES, cost.name)].count);
+               
             }
-           
-            if (iter < (resourceTypes.length - 1)) { // If not at max index, repeat for next index.
-                
-                upgrade (upgradeItem, iter+1);
-                
-                return null;
-            } else if (numCurrencies == satisfied) { 
-              
-                //If you have RESOURCES for ALL non-null costs, then proceed with upgrade.
-                iter = 0;
-                for (let iter of resourceTypes) {
-                   
-                    RESOURCES[returnIndex(RESOURCES, iter)]['count'] -= upgradeItem[iter.concat("Cost")]; // Take away currency.
-                }
-                
-                upgradeItem.result(); //Calls function to grant upgrade bonuses.
-                getId(upgradeItem.id.concat("Button")).style.visibility = 'hidden';
-                
-            }
-    } 
+        }
+        UPGRADESPURCHASED.push(upgrade.id);
+        upgrade.result();
+        getId(upgrade.id + "Tooltip").style.visibility = 'hidden';
+        getId(upgrade.id + "Button").style.visibility = 'hidden';
+        getId('upgradeTable').deleteRow($(upgrade.id + "Button").index('upgradeTable'));
+        updateProductionArray();
+    }
+
+}
+
+ 
+
 var TECHPURCHASED = [];
-    function upgTech (techItem, iter) {
-        iter = iter || 0;
-        if (iter == 0) {
-            numCurrencies = satisfied = 0;
+function upgradeTech (technology) {
+    let insufficient = false;
+    for (let cost of technology.costs){
+        let value = numFormat(Math.ceil(cost.value));
+        let n = 0;
+        if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+            n = CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count;        
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        } else {
+            n = RESOURCES[returnIndex(RESOURCES, cost.name)].count;          
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        }
+        
+    }
+    if (!(insufficient)) {
+        for (let cost of technology.costs) { 
+            let temp = cost.value; // Removes the currency from your inventory.
+            if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+                CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count);
+               
+            } else {
+                RESOURCES[returnIndex(RESOURCES, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(RESOURCES[returnIndex(RESOURCES, cost.name)].count);
+               
+            }
+        }
+        UPGRADESPURCHASED.push(technology.id);
+        technology.result();
+        getId(technology.id + "Button").style.visibility = 'hidden';
+        getId('technologyTable').deleteRow($(technology.id + "Button").index('technologyTable'));
+        updateProductionArray();
+    }
+} 
+
+function createTooltip (object, type, annex) { // Make a tooltip
+    annex = annex || "";
+    let array = object.costs;
+    var tooltip = "";
+        tooltip += object.name + "\n";
+        tooltip += object.description.toString() + "\n";
+        tooltip += divider + "\n";
+    
+        for (const cost of object.costs) {
+            let value = numFormat(Math.ceil(cost.value));
+            if (cost.name == 'money') {
+                tooltip += numFormat(Math.ceil(cost.value)) + " dollars \n";
+            } else {
+                tooltip += numFormat(Math.ceil(cost.value)) + " " + cost.name + "\n";
+            }
+        }
+        if (type == 'building') {
+            for (let x = 0; x < object.production.length - 1; x++) {
+                const capitalName = object.production[x].name.substring(0,1).toUpperCase() + object.production[x].name.substring(1);
+                tooltip += capitalName + " Production: " + numFormat(Math.round(object.production[x].value * 700)/100);
+            }
+        }
+        tooltip += divider + "\n";
+        if (type == "building") {
+            
+        } else if (type == 'upgrade') {
+            tooltip += object.tooltip + "\n";
+        }
+        tooltip += annex;   
+        return tooltip;
+      
+}
+
+
+
+function buyBuilding (building) {
+    let insufficient = false;
+    for (let cost of building.costs){
+        let value = numFormat(Math.ceil(cost.value));
+        let n = 0;
+        if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+            n = CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count;        
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        } else {
+            n = RESOURCES[returnIndex(RESOURCES, cost.name)].count;          
+            if (n >= cost.value) {
+                continue;   
+            } else {   
+                insufficient = true;
+            } 
+        }
+        
+    }
+    if (!(insufficient)) {
+        building.count++;
+        getId(building.id + "CountDisp").innerText = numFormat(building.count);
+        
+        for (let cost of building.costs) { 
+            let temp = cost.value;
+            if (RESOURCES[returnIndex(RESOURCES, cost.name)] == undefined) {
+                CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, cost.name)].count);
+                temp *= building.costRatio; //Increases cost of items
+            } else {
+                RESOURCES[returnIndex(RESOURCES, cost.name)].count -= temp;
+                getId(cost.name.toLowerCase() + "Disp").innerHTML = numFormat(RESOURCES[returnIndex(RESOURCES, cost.name)].count);
+                temp *= building.costRatio;
+            }
         }
        
-        var resourceTypes = ['money', 'science', 'popularity', 'energy', 'darkMatter']; // UPDATE THIS to match the number of resource types.
-         //Checks null value of each resource type for the tech.      
+            for (let cost of building.costs) {
+                var temp = cost.name.substring(0,1).toUpperCase() + cost.name.substring(1); //Capitalizes the first letter.
+                cost.value *= building.costRatio;
+                getId(building.id + "Tooltip").innerText = createTooltip(building, 'building');
                 
-                if (!(techItem[resourceTypes[iter].concat("Cost")] == null)) { // If the cost value not null
-                    numCurrencies++;                    
-                    let num = RESOURCES[returnIndex(RESOURCES, resourceTypes[iter])]['count'];                
-                    if (num >= techItem[resourceTypes[iter].concat('Cost')]) {
-                       satisfied++;//If count > cost, add +1 to satsified.                    
-                    }
-                }
-               
-                if (iter < (resourceTypes.length - 1)) { // If not at max index, repeat for next index.  
-                    upgTech(techItem, iter+1);                    
-                    return null;
-                } else if (numCurrencies == satisfied) {                
-                    //If you have RESOURCES for ALL non-null costs, then proceed with tech.
-                    iter = 0;
-                    for (let iter of resourceTypes) {                       
-                        RESOURCES[returnIndex(RESOURCES, iter)]['count'] -= techItem[iter.concat("Cost")]; // Take away currency.
-                    }
-                    TECHPURCHASED.push(techItem.id);
-                }
             }
-
-/* Building Buy Functions */
-function buyBum () {
-    var bumObj = BUILDINGS[returnIndex(BUILDINGS, 'bumBuilding')]; //Used to clarify other areas, in that bumObj is equal to the value.
-    if (RESOURCES[1].count >= bumObj.moneyCost) {
-        RESOURCES[1].count -= Math.floor(bumObj.moneyCost); // Takes resource(s) if you have enough, then adds one building and increases moneyCost.
-        
-        bumObj.count++;
-        bumObj.moneyCost *= 1.15;
-        
+        updateProductionArray();
     }
-    //ID updaters
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('bumCountDisp').innerText = numFormat(bumObj.count);
-    getId('bumMoneyCostDisp').innerHTML = numFormat(Math.round(bumObj.moneyCost));
-    getId('bumNumberProdBase').innerText = numFormat(Math.round(bumObj.numberProdBase * 700) / 100);
 }
-
-function buyGradStudent () {
-    var gradObj = BUILDINGS[returnIndex(BUILDINGS, 'gradBuilding')];
-    if (RESOURCES[1].count >= gradObj.moneyCost) {
-        
-        RESOURCES[1].count -= Math.floor(gradObj.moneyCost);
-
-        gradObj.moneyCost *= 1.15;
-        gradObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('gradCountDisp').innerText = numFormat(gradObj.count);
-    
-    getId('gradMoneyCostDisp').innerHTML = numFormat(Math.round(gradObj.moneyCost));
-    getId('gradNumberProdBase').innerText = numFormat(Math.round(gradObj.numberProdBase * 700) / 100);
-}
-
-function buyMathematician() {
-    var mathematicianObj = BUILDINGS[returnIndex(BUILDINGS, 'mathematicianBuilding')];
-    if (RESOURCES[1].count >= mathematicianObj.moneyCost) {
-        RESOURCES[1].count -= Math.floor(mathematicianObj.moneyCost);
-
-        mathematicianObj.moneyCost *= 1.15;
-        mathematicianObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('mathematicianCountDisp').innerText = numFormat(mathematicianObj.count);
-    
-    getId('mathematicianMoneyCostDisp').innerHTML = numFormat(Math.round(mathematicianObj.moneyCost));
-    getId('mathematicianNumberProdBase').innerText = numFormat(Math.round(mathematicianObj.numberProdBase * 700) / 100);
-    getId('mathematicianScienceProdBase').innerText = numFormat(Math.round(mathematicianObj.scienceProdBase * 700) / 100);
-}
-
-function buyComputer() {
-    var computerObj = BUILDINGS[returnIndex(BUILDINGS, 'computerBuilding')];
-    if (RESOURCES[1].count >= computerObj.moneyCost) {
-        RESOURCES[1].count -= Math.floor(computerObj.moneyCost);
-
-        computerObj.moneyCost *= 1.15;
-        computerObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('computerCountDisp').innerText = numFormat(computerObj.count);
-    getId('computerMoneyCostDisp').innerHTML = numFormat(Math.round(computerObj.moneyCost));
-    getId('computerNumberProdBase').innerText = numFormat(Math.round(computerObj.numberProdBase * 700) / 100);
-    getId('computerScienceProdBase').innerText = numFormat(Math.round(computerObj.scienceProdBase * 700) / 100);
-}
-
-function buyPaperBoy() {
-    var paperBoyObj = BUILDINGS[returnIndex(BUILDINGS, 'paperBoyBuilding')];
-    if (RESOURCES[1].count >= paperBoyObj.moneyCost &&
-        RESOURCES[2].count >= paperBoyObj.scienceCost) {
-        RESOURCES[1].count -= Math.floor(paperBoyObj.moneyCost);
-        RESOURCES[2].count -= Math.floor(paperBoyObj.scienceCost);
-
-        paperBoyObj.moneyCost *= 1.15;
-        paperBoyObj.scienceCost *= 1.155;
-        paperBoyObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('paperBoyCountDisp').innerText = numFormat(paperBoyObj.count);
-    getId('paperBoyMoneyCostDisp').innerHTML = numFormat(Math.round(paperBoyObj.moneyCost));
-    getId('paperBoyScienceCostDisp').innerHTML = numFormat(Math.round(paperBoyObj.scienceCost));
-    getId('paperBoyPopularityProdBase').innerText = numFormat(Math.round(paperBoyObj.popularityProdBase * 7000) / 1000);
-    
-}
-
-function buyIndustrialCalculator() {
-    var industrialCalculatorObj = BUILDINGS[returnIndex(BUILDINGS, 'industrialCalculatorBuilding')];
-    if (RESOURCES[1].count >= industrialCalculatorObj.moneyCost &&
-        RESOURCES[2].count >= industrialCalculatorObj.scienceCost) {
-
-        RESOURCES[1].count -= Math.floor(industrialCalculatorObj.moneyCost);
-        RESOURCES[2].count -= Math.floor(industrialCalculatorObj.scienceCost);
-
-        industrialCalculatorObj.moneyCost *= 1.15;
-        industrialCalculatorObj.scienceCost *= 1.155;
-        industrialCalculatorObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('industrialCalculatorCountDisp').innerText = numFormat(industrialCalculatorObj.count);
-    getId('industrialCalculatorMoneyCostDisp').innerHTML = numFormat(Math.round(industrialCalculatorObj.moneyCost));
-    getId('industrialCalculatorScienceCostDisp').innerHTML = numFormat(Math.round(industrialCalculatorObj.scienceCost));
-    getId('industrialCalculatorNumberProdBase').innerText = numFormat(Math.round(industrialCalculatorObj.numberProdBase * 700) / 100);
-    getId('industrialCalculatorScienceProdBase').innerText = numFormat(Math.round(industrialCalculatorObj.scienceProdBase * 700) / 100);
-    
-}
-
-function buyAccelerator() {
-    var acceleratorObj = BUILDINGS[returnIndex(BUILDINGS, 'acceleratorBuilding')];
-    if (RESOURCES[1].count >= acceleratorObj.moneyCost &&
-        RESOURCES[2].count >= acceleratorObj.scienceCost) {
-        
-        RESOURCES[1].count -= Math.floor(acceleratorObj.moneyCost);
-        RESOURCES[2].count -= Math.floor(acceleratorObj.scienceCost);
-        
-        acceleratorObj.moneyCost *= 1.15;
-        acceleratorObj.scienceCost *= 1.155;
-        acceleratorObj.count++;
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('acceleratorCountDisp').innerText = numFormat(acceleratorObj.count);
-    getId('acceleratorMoneyCostDisp').innerHTML = numFormat(Math.round(acceleratorObj.moneyCost));
-    getId('acceleratorScienceCostDisp').innerHTML = numFormat(Math.round(acceleratorObj.scienceCost));
-    getId('acceleratorNumberProdBase').innerText = numFormat(Math.round(acceleratorObj.numberProdBase * 700) / 100);
-    getId('acceleratorScienceProdBase').innerText = numFormat(Math.round(acceleratorObj.scienceProdBase * 700) / 100);
-    getId('acceleratorEnergyProdBase').innerText = numFormat(Math.round(acceleratorObj.energyProdBase * 7000) / 1000);
-}
-
-function buyLightManipulator() {
-    var lightManipulatorObj = BUILDINGS[returnIndex(BUILDINGS, 'lightManipulatorBuilding')];
-    if (RESOURCES[1].count >= lightManipulatorObj.moneyCost &&
-        RESOURCES[2].count >= lightManipulatorObj.scienceCost) {
-        
-        RESOURCES[1].count -= Math.floor(lightManipulatorObj.moneyCost);
-        RESOURCES[2].count -= Math.floor(lightManipulatorObj.scienceCost);
-        
-        lightManipulatorObj.moneyCost *= 1.15;
-        lightManipulatorObj.scienceCost *= 1.155;
-        lightManipulatorObj.count++;
-        player.globalMultiplier += 0.03;
-
-
-    }
-    getId('numberDisp').innerHTML = numFormat(Math.floor(RESOURCES[0].count));
-    getId('moneyDisp').innerHTML = numFormat(Math.floor(RESOURCES[1].count));
-    getId('scienceDisp').innerHTML = numFormat(Math.round(RESOURCES[2].count * 100) / 100);
-    getId('lightManipulatorCountDisp').innerText = numFormat(lightManipulatorObj.count);
-    getId('lightManipulatorMoneyCostDisp').innerHTML = numFormat(Math.round(lightManipulatorObj.moneyCost));
-    getId('lightManipulatorScienceCostDisp').innerHTML = numFormat(Math.round(lightManipulatorObj.scienceCost));
-    getId('lightManipulatorScienceProdBase').innerText = numFormat(Math.round(lightManipulatorObj.scienceProdBase * 700) / 100);
-    getId('lightManipulatorEnergyProdBase').innerText = numFormat(Math.round(lightManipulatorObj.energyProdBase * 7000) / 1000);
-}
-
-
+const divider = '----------------------------------------------------------------';
 var BUILDINGSSHOWN = [];
 var trBuffer = 1;
 function checkVisibilityOnBuildings () {
      //Buffers so every 2 td's there's a new tr.
     var numRows = 0; //Number of rows in the table
     for (let index of BUILDINGS) { //Note that index is THE OBJECT, so when you call it, you only call index, not BUILDINGS[index].
-        
+        let tr = document.createElement("tr");
+        let td = document.createElement("td");
+        let button = document.createElement("td");
+        let tooltip = document.createElement("div");
+        let table = getId('buildingsTable');
         if (index.requirement() && !(BUILDINGSSHOWN.includes(index.id))) {
-            
+         
             BUILDINGSSHOWN.push(index.id);
-            var table = getId('buildingsTable');
-            if (trBuffer == 1) {
-                
+            
+
+            if (trBuffer == 1) {   
+                table.appendChild(tr);
+                tr.appendChild(td);
                 numRows++;
                 trBuffer = 0;    
-                table.appendChild(tr = document.createElement("tr"));
-                tr.appendChild(td = document.createElement("td"));
-                td.innerHTML = index.html;
-                td.style.visibility = 'visible';
-                tr.id = 'buildingTableRow'.concat(numRows.toString);
-
-                td.children[0].addEventListener('click', index.buyFunction);
-                
-            } else {
-                
-                trBuffer++;
-                var rows = table.getElementsByTagName('tr');
-                table.rows[rows.length - 1].appendChild(td = document.createElement("td"));
-                td.style.visibility = 'visible';
-                td.innerHTML = index.html;
-                
-                td.children[0].addEventListener('click', index.buyFunction);
-                
+            } else {  
+                trbuffer++;
+                let rows = getId('buildingsTable').getElementsByTagName("tr");
+                table.rows[rows.length - 1].appendChild(td);
             }
-        
-    
             
+            td.appendChild(button);
+            td.appendChild(tooltip);
+            tooltip.innerHTML = index.tooltip;
+            tooltip.setAttribute('class', 'tooltip');
+            tooltip.setAttribute('id', index.id + "Tooltip");
+            button.setAttribute('id', index.id + "Button");
+            button.innerHTML = index.button;
+            //button.setAttribute('id', index.id + "Button");
+            tooltip.setAttribute('id', index.id + "Tooltip");
+            tooltip.innerText = createTooltip(index, 'building', "");    
+            $(button).hover(function(){  
+                $(tooltip).css("visibility", "visible");
+                }, function(){
+                $(tooltip).css("visiblity", "hidden");
+                tooltip.style.visibility = 'hidden';
+            });
+
+            button.addEventListener("click", function() { buyBuilding(index) } ); 
         }
     }  
 }
@@ -443,67 +394,95 @@ function objectLength( object ) {
     return length;
 };
 
+
+
 var numBuildings = objectLength(BUILDINGS);
 var numUpgrades = objectLength(UPGRADES);
 
-function checkVisiblityOnUpgrades() {
+for (var i = 0; i < UPGRADES.length; i++)
+    UPGRADES[i].trId = UPGRADES[i].id.concat("TableRow");
+
+
+
+function checkVisiblityOnUpgrades() { 
+    let tr = document.createElement("tr"); //Create elements
+    let td = document.createElement("td");
+    let button = document.createElement("td");
+    let tooltip = document.createElement("div");
+    let table = getId('upgradeTable');
+
     for (let iter of UPGRADES) {
-        var currentUpgrade = iter;
-        console.log(BUILDINGS[returnIndex(BUILDINGS, 'computerBuilding')].count);
-        if (iter.requirement() && UPGRADESPURCHASED.includes(iter.id) == false) {
-        
-            /* Null Checks before updating html */
-            console.log(iter.id);
-            UPGRADESPURCHASED.push(iter.id);
-            var table = getId('upgradeTable');    
-            table.appendChild(tr = document.createElement("tr"));
-            tr.appendChild(td = document.createElement("td"));
-            td.innerHTML = iter.html;
-                 
-            td.children[0].addEventListener('click', () => {
-            upgrade(UPGRADES[returnIndex(UPGRADES,iter.id)]);
-            });
-
-            if ((getId(currentUpgrade.id.concat("ScienceCostDisp")) != null))
-                getId(currentUpgrade.id.concat("ScienceCostDisp")).innerHTML = numFormat(currentUpgrade["scienceCost"]);
-            if (getId(currentUpgrade.id.concat("MoneyCostDisp")) != null)
-                getId(currentUpgrade.id.concat("MoneyCostDisp")).innerHTML = numFormat(currentUpgrade["moneyCost"]);
-            if (getId(currentUpgrade.id.concat("PopularityCostDisp")) != null)
-                getId(currentUpgrade.id.concat("PopularityCostDisp")).innerHTML = numFormat(currentUpgrade["popularityCost"]);
-
+        if ((iter.isVisible) == null) { //Add isVisible
+            iter.isVisible = false;
         }
+        
+        var currentUpgrade = iter;
+        if (iter.requirement() && UPGRADESPURCHASED.includes(iter.id) == false && iter.isVisible == false) { //If not visible and requirement met
+            
+            iter.isVisible = true;
+            /* Null Checks before updating html */
+           
+            table.appendChild(tr);          
+            tr.appendChild(td);
+            td.appendChild(button);
+            td.appendChild(tooltip);
+            button.innerHTML = iter.button;
+            button.setAttribute('id', iter.id + "Button");
+            tooltip.innerText = createTooltip(iter, 'upgrade');
+            tooltip.setAttribute('class', 'tooltip');
+            tooltip.setAttribute('id', iter.id + "Tooltip");
+            let id = "#" + iter.id + "Button";
+            $(button).hover(function(){  
+                $(tooltip).css("visibility", "visible");
+                }, function(){
+                $(tooltip).css("visiblity", "hidden");
+                tooltip.style.visibility = 'hidden';
+            });  
+            td.addEventListener('click', () => { upgrade(iter);} );
+        }
+        
     }
 
 }
-
+var TECHNOLOGYPURCHASED = [];
 function checkVisiblityOnTechnology() {
+    let tr = document.createElement("tr"); //Create elements
+    let td = document.createElement("td");
+    let button = document.createElement("td");
+    let tooltip = document.createElement("div");
+    let table = getId('technologyTable');
+
     for (let iter of TECHNOLOGY) {
-        var currentUpgrade = iter;
-        console.log(BUILDINGS[returnIndex(BUILDINGS, 'computerBuilding')].count);
-        if (iter.requirement() && UPGRADESPURCHASED.includes(iter.id) == false) {
-        
-            /* Null Checks before updating html */
-            
-            UPGRADESPURCHASED.push(iter.id);
-            var table = getId('upgradeTable');    
-            table.appendChild(tr = document.createElement("tr"));
-            tr.appendChild(td = document.createElement("td"));
-            td.innerHTML = iter.html;
-                 
-            td.children[0].addEventListener('click', () => {
-            upgTech(TECHNOLOGY[returnIndex(UPGRADES,iter.id)]);
-            });
-
-            if ((getId(currentUpgrade.id.concat("ScienceCostDisp")) != null))
-                getId(currentUpgrade.id.concat("ScienceCostDisp")).innerHTML = numFormat(currentUpgrade["scienceCost"]);
-            if (getId(currentUpgrade.id.concat("MoneyCostDisp")) != null)
-                getId(currentUpgrade.id.concat("MoneyCostDisp")).innerHTML = numFormat(currentUpgrade["moneyCost"]);
-            if (getId(currentUpgrade.id.concat("PopularityCostDisp")) != null)
-                getId(currentUpgrade.id.concat("PopularityCostDisp")).innerHTML = numFormat(currentUpgrade["popularityCost"]);
-
+        if ((iter.isVisible) == null) { //Add isVisible
+            iter.isVisible = false;
         }
+        
+        var currentUpgrade = iter;
+        if (iter.requirement() && TECHNOLOGYPURCHASED.includes(iter.id) == false && iter.isVisible == false) { //If not visible and requirement met
+            
+            iter.isVisible = true;
+            /* Null Checks before updating html */
+           
+            table.appendChild(tr);          
+            tr.appendChild(td);
+            td.appendChild(button);
+            td.appendChild(tooltip);
+            button.innerHTML = iter.button;
+            button.setAttribute('id', iter.id + "Button");
+            tooltip.innerText = createTooltip(iter, 'upgrade');
+            tooltip.setAttribute('class', 'tooltip');
+            tooltip.setAttribute('id', iter.id + "Tooltip");
+            let id = "#" + iter.id + "Button";
+            $(button).hover(function(){  
+                $(tooltip).css("visibility", "visible");
+                }, function(){
+                $(tooltip).css("visiblity", "hidden");
+                tooltip.style.visibility = 'hidden';
+            });  
+            td.addEventListener('click', () => { upgradeTech(iter);} );
+        }
+        
     }
-
 }
 
 function checkVisibilityOnResources() {
@@ -544,82 +523,73 @@ function getElementsToUpdate() {
 /* Initialization */
 UPGRADESPURCHASED = [];
 getElementsToUpdate();
-var lightManipulatorIsDisabled = false;
-function lightManipulatorEnergyCheck() {
-    let boolean = (RESOURCES[4].count <= (0.5 * BUILDINGS[returnIndex(BUILDINGS, 'lightManipulatorBuilding')].count));
-    if (boolean) {
-            lightManipulatorIsDisabled = true;
-            player.globalMultiplier -= (0.03 * (RESOURCES[4].count <= (0.5 * BUILDINGS[returnIndex(BUILDINGS, 'lightManipulatorBuilding')].count)));
-            getId('buyLightManipulatorButton').style.backgroundColor = '#f1f1f1';
-    } else if (lightManipulatorIsDisabled) {
-        lightManipulatorIsDisabled = false;
-            player.globalMultiplier += (0.03 * (RESOURCES[4].count <= (0.5 * BUILDINGS[returnIndex(BUILDINGS, 'lightManipulatorBuilding')].count)));
-            getId('buyLightManipulatorButton').style.backgroundColor = '#ffffff';
+
+
+var buffer = 0; //This will buffer the count of times the checkVisibilityOnUpgrades() and checkVisibilityOnUpgrades() functions are called as to not overuse RESOURCES.
+
+function updateProductionArray () {
+    for (let prodArr of BUILDINGS) {
+        for (let prod of prodArr.production) {
+        if (prodArr.count > 0) {
+        if (!(PRODUCTION.filter(e => e.name === prod.name).length > 0)) {
+            PRODUCTION.push(prod);
+        } else {
+            const index = PRODUCTION.findIndex(function(x) {
+                return x.name == prod.name;
+            });
+            PRODUCTION[index].value += prod.value; //Increase array value by production value * number of buildings.
+            }
+        }
+        }
     }
 }
 
+let start = "";
+let numTicksOffline = 1;
+let offlineTickComplete = false;
+function onBlur() {
+    start = Date.now();
+    offlineTickComplete = false;
+};
+function onFocus(){
+    const msOffline = Date.now() - start;
+    numTicksOffline += Math.ceil(msOffline / 200);
+    addCurrency(numTicksOffline);
+};
 
+if (/*@cc_on!@*/false) { // check for Internet Explorer
+	document.onfocusin = onFocus;
+	document.onfocusout = onBlur;
+} else {
+	window.onfocus = onFocus;
+	window.onblur = onBlur;
+}
+
+function addCurrency(numTicksOffline) {
+    for (let prod of PRODUCTION) {
+        if (prod.type == 'material') {
+            CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, prod.name)].count += prod.value * numTicksOffline; //Adds amount * offline (if applicable).
+            getId(prod.name + "Disp").innerText = CRAFTINGMATERIALS[returnIndex(CRAFTINGMATERIALS, prod.name)].count; //Updates ID
+        }
+        RESOURCES[returnIndex(RESOURCES, prod.name)].count += prod.value  * numTicksOffline;
+            getId(prod.name + "Disp").innerText = RESOURCES[returnIndex(RESOURCES, prod.name)].count;
+    }
+}
 var fcn = setInterval(update, (1000/7), getElementsToUpdate()); // 1 second divided by 7 ticks per second (143ms)
-var buffer = 0; //This will buffer the count of times the checkVisibilityOnUpgrades() and checkVisibilityOnUpgrades() functions are called as to not overuse RESOURCES.
-
 
 function update(elem) {
+
     buffer++;
     if (buffer == 35) {
     checkVisibilityOnBuildings();
     checkVisiblityOnUpgrades();
     checkVisibilityOnResources();
- 
+    checkVisiblityOnTechnology()
     buffer = 0;
     } // Every 5 seconds (35 ticks) visibility will be checked and updated.
-
-        for (let indexer of BUILDINGS) { //Makes scienceProdBase not null.
-            indexer.numberProdBase = indexer.numberProdBase || 0;
-        }    
-  
-        RESOURCES[0].count += 
-                    BUILDINGS.reduce( (sum, item) => sum + (item.numberProdBase * item.count), 0 ) * player.globalMultiplier;
-        RESOURCES[0].totalAmount += 
-                    BUILDINGS.reduce( (sum, item) => sum + (item.numberProdBase * item.count), 0 ) * player.globalMultiplier;            
-       
-        for (let indexer of BUILDINGS) { //Makes scienceProdBase not null.
-            indexer.scienceProdBase = indexer.scienceProdBase || 0;
-        }
-
-        RESOURCES[2].count+=  
-                    BUILDINGS.reduce( (sum, item) => sum + (item.scienceProdBase * item.count), 0 ) * player.globalMultiplier;
-        RESOURCES[2].totalAmount += 
-                    BUILDINGS.reduce( (sum, item) => sum + (item.scienceProdBase * item.count), 0 ) * player.globalMultiplier;                    
-        
-        
-        for (let indexer of BUILDINGS) { //Makes popularityProdBase not null.
-            indexer.popularityProdBase = indexer.popularityProdBase || 0;
-        }
-        
-        RESOURCES[3].count+=           
-                    BUILDINGS.reduce( (sum, item) => sum + (item.popularityProdBase * item.count), 0 ) * player.globalMultiplier;
-        RESOURCES[3].totalAmount += 
-                    BUILDINGS.reduce( (sum, item) => sum + (item.popularityProdBase * item.count), 0 ) * player.globalMultiplier;
-
-        for (let indexer of BUILDINGS) { //Makes energyProdBase not null.
-            indexer.energyProdBase = indexer.energyProdBase || 0;
-        }
-        
-        RESOURCES[4].count+=           
-                    BUILDINGS.reduce( (sum, item) => sum + (item.energyProdBase * item.count), 0 ) * player.globalMultiplier;
-        RESOURCES[4].totalAmount += 
-                    BUILDINGS.reduce( (sum, item) => sum + (item.energyProdBase * item.count), 0 ) * player.globalMultiplier;
-
-        for (let indexer of BUILDINGS) { //Makes darkMatterProdBase not null.
-            indexer.darkMatterProdBase = indexer.darkMatterProdBase || 0;
-        }
-        
-        RESOURCES[5].count+=           
-                    BUILDINGS.reduce( (sum, item) => sum + (item.darkMatterProdBase * item.count), 0 ) * player.globalMultiplier;
-        RESOURCES[5].totalAmount, RESOURCES[5].totalAmount +=           
-                    BUILDINGS.reduce( (sum, item) => sum + (item.darkMatterProdBase * item.count), 0 ) * player.globalMultiplier;
-
-        //Display vars for html so that rounding errors don't happen.
+     
+    addCurrency(1);
+      //Display vars for html so that rounding errors don't happen.
         var numDisp = Math.floor(RESOURCES[0].count);
         var moneyDisp = Math.floor(RESOURCES[1].count * 100) / 100;
         var sciDisp = Math.floor(RESOURCES[2].count * 100) / 100;
@@ -628,14 +598,14 @@ function update(elem) {
         var darkMatterDisp = Math.floor(RESOURCES[5].count * 100) / 100;
         
 
-        var moneyTotalPerTick =  player.globalMultiplier * Math.pow(RESOURCES[0].count, (1/(player.moneyRatio))) / 7; //Cash flow per 143ms (7n for total / sec ish)       
-        var scienceTotalPerTick = BUILDINGS.reduce( (sum, item) => sum + (item.scienceProdBase * item.count), 0 ) * player.globalMultiplier;
-        var popularityTotalPerTick = BUILDINGS.reduce( (sum, item) => sum + (item.popularityProdBase * item.count), 0 ) * player.globalMultiplier;
-        var energyTotalPerTick = BUILDINGS.reduce( (sum, item) => sum + (item.energyProdBase * item.count), 0 ) * player.globalMultiplier;
-        var darkMatterTotalPerTick = BUILDINGS.reduce( (sum, item) => sum + (item.darkMatterProdBase * item.count), 0 ) * player.globalMultiplier;
-
-        RESOURCES[1].count += moneyTotalPerTick;
-
+        
+        var moneyTotalPerTick =  player.globalMultiplier * Math.pow(RESOURCES[0].count, (1/(player.moneyRatio))) / 7; //Cash flow per 143ms (7n for total / sec ish)   
+        RESOURCES[1].count += moneyTotalPerTick; //Increases money    
+        var scienceTotalPerTick = PRODUCTION[returnIndex(PRODUCTION, 'science')].value || 0; //Set production values from array, or zero if not defined.
+        var popularityTotalPerTick = PRODUCTION[returnIndex(PRODUCTION, 'popularity')].value || 0;
+        var energyTotalPerTick = PRODUCTION[returnIndex(PRODUCTION, 'energy')].value || 0;
+        var darkMatterTotalPerTick = PRODUCTION[returnIndex(PRODUCTION, 'darkMatter')].value || 0; 
+        
         //Element updating
         elem.numberDisp.textContent = numFormat(numDisp);
         elem.moneyDisp.textContent = numFormat(moneyDisp);
@@ -652,4 +622,3 @@ function update(elem) {
 
         
     }
- 
