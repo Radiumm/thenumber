@@ -553,8 +553,10 @@ function onBlur() {
 };
 function onFocus(){
     const msOffline = Date.now() - start;
-    numTicksOffline += Math.ceil(msOffline / 360);
+    numTicksOffline = Math.ceil(msOffline / 360);
     addCurrency(numTicksOffline);
+    numTicksOffline = 1;
+	
 };
 
 if (/*@cc_on!@*/false) { // check for Internet Explorer
@@ -574,6 +576,7 @@ function addCurrency(numTicksOffline) {
         RESOURCES[returnIndex(RESOURCES, prod.name)].count += prod.value  * numTicksOffline;
             getId(prod.name + "Disp").innerText = RESOURCES[returnIndex(RESOURCES, prod.name)].count;
     }
+   
 }
 var fcn = setInterval(update, (1000/7), getElementsToUpdate()); // 1 second divided by 7 ticks per second (143ms)
 
